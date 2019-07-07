@@ -1,0 +1,46 @@
+{
+    "name": "kennedy-osaze/slim-api-skeleton",
+    "description": "A simple REST API boilerplate built using Slim micro-framework",
+    "keywords": ["framework", "micro-framework", "slim", "api", "rest"],
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Kennedy Osaze",
+            "email": "me.osaze@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.1.0",
+        "slim/slim": "^3.12",
+        "vlucas/phpdotenv": "^3.4",
+        "illuminate/database": "^5.8",
+        "monolog/monolog": "^1.24",
+        "robmorgan/phinx": "^0.10.7"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7.0",
+        "guzzlehttp/guzzle": "^6.3"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "process-timeout": 0
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "start": "php -S localhost:8080 -t public",
+        "test": "vendor/bin/phpunit",
+        "post-root-package-install": [
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+        ]
+    }
+}
