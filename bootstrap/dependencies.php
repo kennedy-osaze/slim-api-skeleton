@@ -4,7 +4,9 @@ use Slim\App;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Processor\UidProcessor;
+use App\Libraries\Validation\Validator;
 use Illuminate\Database\Capsule\Manager as Capsule;
+use Respect\Validation\Validator as RespectValidator;
 
 return function (App $app) {
     $container = $app->getContainer();
@@ -28,5 +30,12 @@ return function (App $app) {
         $logger->pushHandler(new StreamHandler($logger_settings['path'], $logger_settings['level']));
 
         return $logger;
+    };
+
+    // Request Validator
+    $container['validator'] = function ($c) {
+        RespectValidator::with('App\\Libraries\\Validation\\Rules\\');
+
+        return new Validator;
     };
 };
