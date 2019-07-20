@@ -37,11 +37,12 @@ return [
         'driver' => getenv('DB_DRIVER') ?: 'mysql',
         'host' => getenv('DB_HOST') ?: '127.0.0.1',
         'port' => getenv('DB_PORT') ?: '3306',
-        'name' => getenv('DB_DATABASE') ?: 'slim_api_db',
+        'database' => getenv('DB_DATABASE') ?: 'slim_api_db',
         'username' => getenv('DB_USERNAME') ?: 'root',
         'password' => getenv('DB_PASSWORD') ?: '',
         'charset'   =>  'utf8',
-        'collation' =>  'utf8_unicode_ci'
+        'collation' =>  'utf8_unicode_ci',
+        'prefix' => ''
     ],
 
     'logger' => [

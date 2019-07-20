@@ -15,8 +15,8 @@ return [
         'production' => [
             'adapter' => $database['driver'],
             'host' => $database['host'],
-            'name' => $database['name'],
-            'user' => $database['user'],
+            'name' => $database['database'],
+            'user' => $database['username'],
             'pass' => $database['password'],
             'port' => $database['port'],
             'charset' => $database['charset'],
@@ -26,8 +26,8 @@ return [
         'local' => [
             'adapter' => $database['driver'],
             'host' => $database['host'],
-            'name' => $database['name'],
-            'user' => $database['user'],
+            'name' => $database['database'],
+            'user' => $database['username'],
             'pass' => $database['password'],
             'port' => $database['port'],
             'charset' => $database['charset'],
