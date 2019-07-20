@@ -11,6 +11,10 @@ $app = new \Slim\App(['settings' => $config]);
 $dependencies = require_once 'dependencies.php';
 $dependencies($app);
 
+// Set up Registry
+$registry = require_once 'registry.php';
+$registry($app);
+
 //Set up error handling
 $error_handlers = require_once 'error-handlers.php';
 $error_handlers($app);

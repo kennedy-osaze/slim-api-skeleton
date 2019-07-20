@@ -4,6 +4,7 @@ use Slim\App;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use App\Exceptions\HttpException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 error_reporting(E_ALL);
 
@@ -51,6 +52,10 @@ return function (App $app) {
 
     $container['errorHandler'] = function ($container) {
         return function (Request $request, Response $response, Throwable $throwable) use ($container) {
+            if ($throwable instanceof ModelNotFoundException) {
+                return $container['notFoundHandler']($request, $response);
+            }
+
             if ($throwable instanceof HttpException) {
                 return $container['httpExceptionHandler']($request, $response, $throwable);
             }

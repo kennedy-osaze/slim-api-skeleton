@@ -9,4 +9,6 @@ return function (App $app) {
     $app->add(new \App\Middleware\TrailingSlash($container));
 
     $app->add(new \App\Middleware\Cors($container));
+
+    $app->add(new \App\Middleware\BindRoute($container));
 };
