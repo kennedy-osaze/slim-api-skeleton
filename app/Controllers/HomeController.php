@@ -8,7 +8,7 @@ use Slim\Http\Response;
 
 class HomeController extends Controller
 {
-    public function index(Request $request, Response $response, array $args = [])
+    public function index(Request $request, Response $response)
     {
         return $response->withJson([
             'status' => 'success',
