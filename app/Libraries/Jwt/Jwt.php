@@ -31,7 +31,11 @@ class JWT extends BaseJWT
         'authenticable' => User::class,
     ];
 
-    
+    /**
+     * Request from which jwt uses to obtain some claims information such as issuer
+     *
+     * @var ServerRequestInterface
+     */
     protected $request;
 
     protected $payload = [];
@@ -46,19 +50,36 @@ class JWT extends BaseJWT
         $this->validateConfig();
     }
 
-    public function getTokenForUser(JwtSubjectInterface $user, $accessing_from = null)
+    /**
+     * Generate token for the user provided
+     *
+     * @param JwtSubjectInterface $user
+     * @param string $audience
+     *
+     * @throws JwtException
+     * @return string
+     */
+    public function getTokenForUser(JwtSubjectInterface $user, string $audience = null)
     {
-        return $this->generateToken($user->getJwtIdentifier(), $accessing_from, $user->getJwtCustomClaims());
+        return $this->generateToken($user->getJwtIdentifier(), $audience, $user->getJwtCustomClaims());
     }
 
-    public function generateToken(string $subject = null, string $for = null, array $custom_claims = [])
+    /**
+     * Generates token using the claims data provided as parameters
+     *
+     * @param string $subject
+     * @param string $audience
+     * @param array $custom_claims
+     *
+     */
+    public function generateToken(string $subject = null, string $audience = null, array $custom_claims = [])
     {
-        $payload = $this->makePayload(array_merge(['sub' => $subject, 'aud' => $for], $custom_claims));
+        $payload = $this->makePayload(array_merge(['sub' => $subject, 'aud' => $audience], $custom_claims));
 
         try {
             return static::encode($payload, $this->getSigningKey(), $this->config['algo']);
         } catch (Exception $e) {
-            throw new JwtException('Unable to generate token:' . $e->getMessage(), $e->getCode(), $e);
+            throw new JwtException('Unable to generate token: ' . $e->getMessage(), $e->getCode(), $e);
         }
     }
 
@@ -146,10 +167,10 @@ class JWT extends BaseJWT
             return $this->config['secret'];
         }
 
-        $key = (string) $this->config['keys']['private'];
+        $key = $this->getKeyContent((string) $this->config['keys']['private']);
         $pass_phrase = (string) $this->config['keys']['pass_phrase'];
 
-        $key_resource = openssl_get_privatekey($this->getKeyContent($key), $pass_phrase);
+        $key_resource = openssl_get_privatekey($key, $pass_phrase);
 
         $this->validateKeyResource($key_resource);
 
@@ -167,8 +188,8 @@ class JWT extends BaseJWT
             return $this->config['secret'];
         }
 
-        $key = (string) $this->config['keys']['public'];
-        $key_resource = openssl_get_publickey($this->getKeyContent($key));
+        $key = $this->getKeyContent((string) $this->config['keys']['public']);
+        $key_resource = openssl_get_publickey($key);
 
         $this->validateKeyResource($key_resource);
 
@@ -182,17 +203,44 @@ class JWT extends BaseJWT
      */
     protected function getKeyContent(string $key)
     {
-        return file_exists($key) ? file_get_contents($key) : $key;
+        // Check if key is a PEM formatted string
+        if (preg_match(
+            '/[\-]{5}[\w\s]+[\-]{5}(.*)[\-]{5}[\w\s]+[\-]{5}/',
+            str_replace([PHP_EOL, "\n", "\r"], '', $key)
+        )) {
+            return $key;
+        }
+
+        $key_path = $key;
+        (strpos($key, 'file://') === 0) and $key_path = substr($key_path, 7);
+
+        if (!is_file($key_path) || !is_readable($key_path)) {
+            throw new InvalidArgumentException(
+                'A valid PEM formatted key string or an (readable) absolute path to key is required'
+            );
+        }
+
+        $fp = fopen($key_path, 'r');
+        $key = fread($fp, 8192);
+        fclose($fp);
+
+        return $key;
     }
 
     /**
-     * Validates key resource
+     * Validates key
+     *
+     * @param mixed $key_resource
      *
      * @throws InvalidArgumentException
      * @return void
      */
     protected function validateKeyResource($key_resource)
     {
+        if (!is_resource($key_resource)) {
+            throw new InvalidArgumentException(sprintf('The key provided is not a resource, %s given', gettype($key_resource)));
+        }
+
         if ($key_resource === false) {
             throw new InvalidArgumentException('Unable to parse key: ' . openssl_error_string());
         }

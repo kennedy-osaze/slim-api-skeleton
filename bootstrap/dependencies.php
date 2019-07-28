@@ -47,6 +47,6 @@ return function (App $app) {
 
     // Jwt
     $container['jwt'] = function ($container) {
-        return Jwt($container->get('settings')['jwt'], $container->request);
+        return new Jwt($container->get('settings')['jwt-auth'], $container->request);
     };
 };

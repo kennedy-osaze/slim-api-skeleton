@@ -18,6 +18,6 @@ class HomeController extends Controller
 
     public function me(Request $request, Response $response, User $user)
     {
-        return $response->withJson(['status' => 'success', 'user' => $user], 200);
+        return $response->withJson(['status' => 'success', 'user' => $user, 'request' => $request->getAttribute('user')], 200);
     }
 }
