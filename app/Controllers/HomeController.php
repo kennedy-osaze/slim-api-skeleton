@@ -8,7 +8,7 @@ use Slim\Http\Response;
 
 class HomeController extends Controller
 {
-    public function index(Request $request, Response $response, array $args = [])
+    public function index(Request $request, Response $response)
     {
         return $response->withJson([
             'status' => 'success',
@@ -18,6 +18,6 @@ class HomeController extends Controller
 
     public function me(Request $request, Response $response, User $user)
     {
-        return $response->withJson(['status' => 'success', 'user' => $user], 200);
+        return $response->withJson(['status' => 'success', 'user' => $user, 'request' => $request->getAttribute('user')], 200);
     }
 }

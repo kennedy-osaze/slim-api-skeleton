@@ -2,6 +2,7 @@
 
 use Slim\App;
 use Monolog\Logger;
+use App\Libraries\Jwt\Jwt;
 use Monolog\Handler\StreamHandler;
 use Monolog\Processor\UidProcessor;
 use App\Libraries\Validation\Validator;
@@ -42,5 +43,10 @@ return function (App $app) {
         RespectValidator::with('App\\Libraries\\Validation\\Rules\\');
 
         return new Validator;
+    };
+
+    // Jwt
+    $container['jwt'] = function ($container) {
+        return new Jwt($container->get('settings')['jwt-auth'], $container->request);
     };
 };
