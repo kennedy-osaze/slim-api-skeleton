@@ -1,9 +1,8 @@
 <?php
 
-require_once '../vendor/autoload.php';
+(\Dotenv\Dotenv::create(__DIR__ . '/../'))->load();
 
 $config = require_once '../config/index.php';
-date_default_timezone_set($config['app']['timezone']);
 
 $app = new \Slim\App(['settings' => $config]);
 
@@ -26,3 +25,5 @@ $middleware($app);
 // Register routes
 $routes = require_once '../routes/web.php';
 $routes($app);
+
+return $app;

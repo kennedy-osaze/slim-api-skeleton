@@ -1,5 +1,9 @@
 <?php
 
+require 'vendor/autoload.php';
+
+(\Dotenv\Dotenv::create(__DIR__))->load();
+
 $config = require_once './config/index.php';
 $database = $config['database'];
 
