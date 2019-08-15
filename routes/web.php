@@ -13,7 +13,6 @@ return function (App $app) {
         $this->get('', HomeController::class . ':index')->setName('home');
 
         $this->get('/users/{user}', HomeController::class . ':me')
-            ->setName('me')
-            ->add(new \App\Middleware\Authenticate($container));
+            ->setName('me');
     });
 };

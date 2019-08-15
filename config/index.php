@@ -1,9 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../vendor/autoload.php';
-
-(\Dotenv\Dotenv::create(__DIR__ . '/../'))->load();
-
 return [
     /**
      *  Slim own configuration settings
@@ -28,6 +24,7 @@ return [
     'app' => [
         'name' => getenv('APP_NAME') ?: 'Slim',
         'env' => getenv('APP_ENV') ?: 'production',
+        'locale' => getenv('APP_LOCALE') ?: 'en',
         'url' => getenv('APP_URL') ?: 'http://localhost',
         'timezone' => getenv('APP_TIME_ZONE') ?: 'UTC',
         'base_dir' => dirname(__DIR__),

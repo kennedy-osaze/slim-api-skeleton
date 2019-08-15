@@ -3,6 +3,8 @@
 use Slim\App;
 use Monolog\Logger;
 use App\Libraries\Jwt\Jwt;
+use App\Libraries\Factory;
+use Faker\Factory as Faker;
 use Monolog\Handler\StreamHandler;
 use Monolog\Processor\UidProcessor;
 use App\Libraries\Validation\Validator;
@@ -29,7 +31,7 @@ return function (App $app) {
 
     // Monolog set up
     $container['logger'] = function ($container) {
-        $logger_settings = $container->get('settings')['logger'];
+        $logger_settings = $container['settings']['logger'];
 
         $logger = new Logger($logger_settings['name']);
         $logger->pushProcessor(new UidProcessor());
@@ -47,6 +49,15 @@ return function (App $app) {
 
     // Jwt
     $container['jwt'] = function ($container) {
-        return new Jwt($container->get('settings')['jwt-auth'], $container->request);
+        return new Jwt($container['settings']['jwt-auth'], $container->request);
+    };
+
+    // Illuminate Factory
+    $container['factory'] = function ($container) {
+        $app_settings = $container['settings']['app'];
+        $base_path = rtrim($app_settings['base_dir'], '\/');
+        $factories_path = $base_path . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'factories';
+
+        return Factory::build(Faker::create($app_settings['locale'] ?: null), $factories_path);
     };
 };

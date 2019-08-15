@@ -2,13 +2,20 @@
 
 use Slim\App;
 
-return function (App $app) {
+$app_middleware = [
+    \App\Middleware\TrailingSlash::class,
+    \App\Middleware\Cors::class,
+    \App\Middleware\BindRoute::class
+];
+
+return function (App $app, array $except = []) use ($app_middleware) {
     $container = $app->getContainer();
 
-    // Application middleware
-    $app->add(new \App\Middleware\TrailingSlash($container));
+    foreach ($app_middleware as $middleware_class) {
+        if (!empty($except) && in_array($middleware_class, $except)) {
+            continue;
+        }
 
-    $app->add(new \App\Middleware\Cors($container));
-
-    $app->add(new \App\Middleware\BindRoute($container));
+        $app->add(new $middleware_class($container));
+    }
 };
