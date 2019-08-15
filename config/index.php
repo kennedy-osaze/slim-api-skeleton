@@ -1,9 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../vendor/autoload.php';
-
-(\Dotenv\Dotenv::create(__DIR__ . '/../'))->load();
-
 return [
     /**
      *  Slim own configuration settings
@@ -28,6 +24,7 @@ return [
     'app' => [
         'name' => getenv('APP_NAME') ?: 'Slim',
         'env' => getenv('APP_ENV') ?: 'production',
+        'locale' => getenv('APP_LOCALE') ?: 'en',
         'url' => getenv('APP_URL') ?: 'http://localhost',
         'timezone' => getenv('APP_TIME_ZONE') ?: 'UTC',
         'base_dir' => dirname(__DIR__),
@@ -59,4 +56,29 @@ return [
         "credentials" => false,
         "max_age" => 3600,
     ],
+
+    'jwt-auth' => [
+        // Supported Algorithms: ['HS256', 'HS384', 'HS512', 'RS256', 'RS384', 'RS512']
+        'algo' => getenv('JWT_ALGO') ?: 'HS256',
+
+        // For symmetric algorithms only (HMAC) like ['HS256', 'HS384', 'HS512'],
+        'secret' => getenv('JWT_SECRET'),
+
+        // For asymmetric algorithms
+        'keys' => [
+            // Absolute path to your public key (e.g. /path/to/public/key)
+            'public' => getenv('JWT_PUBLIC_KEY'),
+            // Absolute path to your private key (e.g. /path/to/public/key)
+            'private' => getenv('JWT_PRIVATE_KEY'),
+            // Passphrase used to the encrypt private key
+            'pass_phrase' => getenv('JW_PASS_PHRASE') ?: ''
+        ],
+
+        // Grace period (seconds) to allow for clock skew. Applies to the`iat`, nbf` and `exp` claims.
+        'leeway' => 0,
+
+        // Length of time (in minutes) that the token will be valid for,
+        'token_lifetime' => 60,
+        'authenticable' => App\Models\User::class, // Model class to authenticate against
+    ]
 ];

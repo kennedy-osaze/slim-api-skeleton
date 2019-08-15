@@ -56,7 +56,7 @@ return function (App $app) {
                 return $container['notFoundHandler']($request, $response);
             }
 
-            if ($throwable instanceof HttpException) {
+            if ($throwable instanceof HttpException && $throwable->getStatusCode() !== 500) {
                 return $container['httpExceptionHandler']($request, $response, $throwable);
             }
 
