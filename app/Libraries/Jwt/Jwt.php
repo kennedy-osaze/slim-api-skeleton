@@ -12,7 +12,7 @@ use Firebase\JWT\{
     ExpiredException, SignatureInvalidException, BeforeValidException
 };
 use App\Libraries\Jwt\Exceptions\{
-    JwtException,InvalidConfigException, TokenInvalidException, TokenExpiredException
+    JwtException, InvalidConfigException, TokenInvalidException, TokenExpiredException
 };
 
 class JWT extends BaseJWT

@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Libraries;
+
 use Faker\Generator as Faker;
 use Illuminate\Database\Eloquent\Factory as EloquentFactory;
 
