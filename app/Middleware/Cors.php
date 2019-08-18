@@ -7,6 +7,15 @@ use Psr\Http\Message\ResponseInterface as Response;
 
 class Cors extends Middleware
 {
+    /**
+     * Handle Cross-Site Request Sharing (CORS) on the server side
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \Psr\Http\Message\ResponseInterface $response
+     * @param \Closure $next
+     *
+     * @return mixed
+     */
     public function __invoke(Request $request, Response $response, $next)
     {
         if (!$this->isCorRequest($request)) {
@@ -26,6 +35,7 @@ class Cors extends Middleware
             $response->withHeader('Access-Control-Allow-Credentials', true);
         }
 
+        // Check request is a preflight request
         if ($request->isOptions()) {
             return $response
                 ->withHeader('Access-Control-Allow-Methods', implode(', ', $settings['methods']))
@@ -40,6 +50,13 @@ class Cors extends Middleware
             ->withHeader('Access-Control-Expose-Headers', implode(', ', $settings['expose_headers']));
     }
 
+    /**
+     * Checks if a request is a CORS request, that is, request is made to another origin
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
+     * @return bool
+     */
     protected function isCorRequest(Request $request)
     {
         if (!$request->hasHeader('Origin')) {
@@ -49,6 +66,13 @@ class Cors extends Middleware
         return !in_array($request->getUri()->getBaseUrl(), $request->getHeader('Origin'));
     }
 
+    /**
+     * Checks if a request is allowed based on the allowed methods and origins set in the config setting file
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
+     * @return bool
+     */
     protected function isRequestAllowed(Request $request)
     {
         $settings = $this->settings['cors'];
