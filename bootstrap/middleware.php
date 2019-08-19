@@ -2,6 +2,7 @@
 
 use Slim\App;
 
+// List of middleware to register
 $app_middleware = [
     \App\Middleware\TrailingSlash::class,
     \App\Middleware\Cors::class,

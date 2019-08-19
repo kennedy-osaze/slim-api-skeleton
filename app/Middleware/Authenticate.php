@@ -11,6 +11,17 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 
 class Authenticate extends Middleware
 {
+    /**
+     * Handle request by checking if it comes with a valid token
+     *
+     * @param \Psr\Http\Message\ResponseInterface $request
+     * @param \Psr\Http\Message\ResponseInterface $response
+     * @param  \Closure  $next
+     *
+     * @return mixed
+     *
+     * @throws \App\Exceptions\HttpException
+     */
     public function __invoke(Request $request, Response $response, $next)
     {
         $token = $this->getRequestBearToken($request);
@@ -37,6 +48,13 @@ class Authenticate extends Middleware
         }
     }
 
+    /**
+     * Get bearer token that is attached to the request
+     *
+     * @param Request $request
+     *
+     * @return string|null
+     */
     protected function getRequestBearToken(Request $request)
     {
         $token = $request->getHeaderLine('Authorization');
