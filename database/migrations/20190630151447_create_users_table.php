@@ -34,6 +34,7 @@ class CreateUsersTable extends AbstractMigration
         $users = $this->table('users');
         $users->addColumn('name', 'string', ['null' => true])
             ->addColumn('email', 'string')
+            ->addColumn('password', 'string')
             ->addColumn('deleted_at', 'timestamp', ['null' => true])
             ->addColumn('created_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP'])
             ->addColumn('updated_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP'])
