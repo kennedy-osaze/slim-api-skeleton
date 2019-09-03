@@ -15,4 +15,8 @@ return function (App $app) {
         $this->get('/users/{user}', HomeController::class . ':me')
             ->setName('me');
     });
+
+    $app->get('/test', function () use ($container) {
+        var_dump($container->auth->attempt(['email' => 'johndoe@example.com', 'password' => 'password']));
+    });
 };

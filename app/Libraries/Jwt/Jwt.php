@@ -148,13 +148,31 @@ class JWT extends BaseJWT
      *
      * @return \App\Libraries\Jwt\JwtSubjectInterface
      */
-    public function getUserByToken(string $token)
+    public function getUserByToken(string $token = null)
     {
+        $token = $token ?? $this->getTokenFromRequest();
+
         $this->validateToken($token);
 
         $authenticable = $this->config['authenticable'];
 
         return (new $authenticable)->getJwtTokenOwnerByIdentifier($this->payload['sub']);
+    }
+
+    /**
+     * Retrieve token from request.
+     *
+     * @return string|null;
+     */
+    public function getTokenFromRequest()
+    {
+        $token = $this->request->getHeaderLine('Authorization');
+
+        if (!$token || substr((string) $token, 0, 6) !== 'Bearer') {
+            return null;
+        }
+
+        return substr((string) $token, 7);
     }
 
     /**

@@ -18,6 +18,7 @@ class UserSeeder extends AbstractSeed
             [
                 'name' => 'John Doe',
                 'email' => 'johndoe@example.com',
+                'password' => password_hash('password', PASSWORD_BCRYPT)
             ]
         ];
 

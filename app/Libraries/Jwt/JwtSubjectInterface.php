@@ -23,7 +23,7 @@ interface JwtSubjectInterface
      *
      * @param mixed $identifier
      *
-     * @return mixed
+     * @return JwtSubjectInterface|null
      */
     public function getJwtTokenOwnerByIdentifier($identifier);
 }

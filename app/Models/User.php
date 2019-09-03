@@ -4,14 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Libraries\Jwt\JwtSubjectInterface;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Libraries\Auth\AuthenticableTrait;
+use App\Libraries\Auth\AuthenticableInterface;
 
-class User extends Model implements JwtSubjectInterface
+class User extends Model implements AuthenticableInterface, JwtSubjectInterface
 {
-    use SoftDeletes;
+    use AuthenticableTrait;
 
     protected $fillable = [
-        'name', 'email'
+        'name', 'email', 'password'
     ];
 
     public function getJwtIdentifier()
@@ -28,6 +29,6 @@ class User extends Model implements JwtSubjectInterface
 
     public function getJwtTokenOwnerByIdentifier($identifier)
     {
-        return static::findOrFail($identifier);
+        return static::where($this->getKeyName(), $identifier)->first();
     }
 }

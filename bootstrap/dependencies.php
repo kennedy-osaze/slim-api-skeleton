@@ -5,6 +5,7 @@ use Monolog\Logger;
 use App\Libraries\Jwt\Jwt;
 use App\Libraries\Factory;
 use Faker\Factory as Faker;
+use App\Libraries\Auth\Auth;
 use Monolog\Handler\StreamHandler;
 use Monolog\Processor\UidProcessor;
 use App\Libraries\Validation\Validator;
@@ -50,6 +51,13 @@ return function (App $app) {
     // Jwt
     $container['jwt'] = function ($container) {
         return new Jwt($container['settings']['jwt-auth'], $container->request);
+    };
+
+    // Auth
+    $container['auth'] = function ($container) {
+        $authenticable_class = $container['settings']['jwt-auth']['authenticable'];
+
+        return new Auth($container, new $authenticable_class);
     };
 
     // Illuminate Factory
