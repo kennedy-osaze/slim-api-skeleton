@@ -38,8 +38,17 @@ class JWT extends BaseJWT
      */
     protected $request;
 
+    /** @var array The payload that holds details of the parsed token */
     protected $payload = [];
 
+    /**
+     * Initialize the the Jwt class
+     *
+     * @param array $config The jwt config settings
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
+     * @return void
+     */
     public function __construct(array $config, Request $request)
     {
         $this->config = array_merge($this->config, $config);
@@ -71,6 +80,7 @@ class JWT extends BaseJWT
      * @param string $audience
      * @param array $custom_claims
      *
+     *  @return void
      */
     public function generateToken(string $subject = null, string $audience = null, array $custom_claims = [])
     {
@@ -83,6 +93,13 @@ class JWT extends BaseJWT
         }
     }
 
+    /**
+     * Generate payload based on the config settings as well as the claims provided
+     *
+     * @param array $claims
+     *
+     * @return array
+     */
     protected function makePayload(array $claims)
     {
         $now = Carbon::now('UTC');
@@ -100,6 +117,15 @@ class JWT extends BaseJWT
         return array_filter($payload);
     }
 
+    /**
+     * Validates the token given
+     *
+     * @param string $token
+     *
+     * @return void
+     *
+     * @throws \App\Libraries\Jwt\Exceptions\JwtException
+     */
     public function validateToken(string $token)
     {
         try {
@@ -115,8 +141,17 @@ class JWT extends BaseJWT
         }
     }
 
-    public function getUserByToken(string $token)
+    /**
+     * Retrieve a user by token
+     *
+     * @param string $token
+     *
+     * @return \App\Libraries\Jwt\JwtSubjectInterface
+     */
+    public function getUserByToken(string $token = null)
     {
+        $token = $token ?? $this->getTokenFromRequest();
+
         $this->validateToken($token);
 
         $authenticable = $this->config['authenticable'];
@@ -124,6 +159,29 @@ class JWT extends BaseJWT
         return (new $authenticable)->getJwtTokenOwnerByIdentifier($this->payload['sub']);
     }
 
+    /**
+     * Retrieve token from request.
+     *
+     * @return string|null;
+     */
+    public function getTokenFromRequest()
+    {
+        $token = $this->request->getHeaderLine('Authorization');
+
+        if (!$token || substr((string) $token, 0, 6) !== 'Bearer') {
+            return null;
+        }
+
+        return substr((string) $token, 7);
+    }
+
+    /**
+     * Validate configuration settings
+     *
+     * @return void
+     *
+     * @throws \App\Libraries\Jwt\Exceptions\InvalidConfigException
+     */
     protected function validateConfig()
     {
         $config = $this->config;
@@ -147,6 +205,11 @@ class JWT extends BaseJWT
         }
     }
 
+    /**
+     * Determine if the algorithm chosen in config settings is asymmetric or not
+     *
+     * @return bool
+     */
     protected function algoIsAsymmetric()
     {
         if (!array_key_exists($this->config['algo'], static::$supported_algs)) {
@@ -200,6 +263,8 @@ class JWT extends BaseJWT
      * Get the content of the key
      *
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     protected function getKeyContent(string $key)
     {
@@ -232,8 +297,9 @@ class JWT extends BaseJWT
      *
      * @param mixed $key_resource
      *
-     * @throws InvalidArgumentException
      * @return void
+     *
+     * @throws InvalidArgumentException
      */
     protected function validateKeyResource($key_resource)
     {

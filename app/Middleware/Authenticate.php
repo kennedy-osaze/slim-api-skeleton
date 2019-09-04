@@ -11,9 +11,20 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 
 class Authenticate extends Middleware
 {
+    /**
+     * Handle request by checking if it comes with a valid token
+     *
+     * @param \Psr\Http\Message\ResponseInterface $request
+     * @param \Psr\Http\Message\ResponseInterface $response
+     * @param  \Closure  $next
+     *
+     * @return mixed
+     *
+     * @throws \App\Exceptions\HttpException
+     */
     public function __invoke(Request $request, Response $response, $next)
     {
-        $token = $this->getRequestBearToken($request);
+        $token = $this->jwt->getTokenFromRequest();
 
         if (!$token) {
             return $response->withJson(['status' => 'error', 'message' => 'Token is required'], 401);
@@ -35,16 +46,5 @@ class Authenticate extends Middleware
 
             throw new HttpException(500, 'An error occurred authenticating user', $e);
         }
-    }
-
-    protected function getRequestBearToken(Request $request)
-    {
-        $token = $request->getHeaderLine('Authorization');
-
-        if (!$token || substr((string) $token, 0, 6) !== 'Bearer') {
-            return null;
-        }
-
-        return substr((string) $token, 7);
     }
 }
