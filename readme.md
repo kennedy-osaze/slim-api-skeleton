@@ -21,3 +21,13 @@ The project uses the following packages
 - Run `composer install` from the application root folder
 - From the project root run `cp .env.example .env`
 - Ensure `storage/` is web writeable.
+
+### Commands
+
+- To create migrations, run `vendor/bin/phinx create NameOfMigration`
+- To run migration, run `vendor/bin/phinx migrate`
+- To rollback a migration, run `vendor/bin/phinx rollback`
+- To create a seeder, run `php vendor/bin/phinx seed:create NameOfSeeder`
+- To run a seeder, run `php vendor/bin/phinx seed:run`
+
+For more information of migrations and seeders, check out the [Phinx Documentation](http://docs.phinx.org/en/latest)

@@ -42,9 +42,6 @@
     },
     "scripts": {
         "start": "php -S localhost:8080 -t public",
-        "test": "vendor/bin/phpunit",
-        "post-root-package-install": [
-            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
-        ]
+        "test": "vendor/bin/phpunit"
     }
 }
