@@ -28,10 +28,12 @@ class Cors extends Middleware
 
         $settings = $this->settings['cors'];
 
-        $allowed_origin = (in_array('*', $settings['allowed_origin'])) ? '*' : $request->getHeaderLine('Origin');
+        $allowed_origin = (in_array('*', $settings['allowed_origin']) && !$settings['credentials'])
+            ? '*'
+            : $request->getHeaderLine('Origin');
         $response->withHeader('Access-Control-Allow-Origin', $allowed_origin);
 
-        if ($allowed_origin !== '*' && $settings['credentials'] === true) {
+        if ($settings['credentials']) {
             $response->withHeader('Access-Control-Allow-Credentials', true);
         }
 
