@@ -6,6 +6,8 @@ use Respect\Validation\Exceptions\NestedValidationException;
 
 class Validator
 {
+    protected $errors = [];
+
     /**
      * @param array $data The data to validate
      * @param array $rules The rules to validate the data against. To get full details about the rules check https://respect-validation.readthedocs.io/en/1.1/list-of-rules/
@@ -23,7 +25,7 @@ class Validator
 
                 $rule->setName($attribute)->assert($value);
             } catch (NestedValidationException $e) {
-                $this->errors[$field] = !empty($messages) ? $e->findMessages($messages) : $e->getMessages();
+                $this->addError($e, $field, $messages);
             }
         }
 
@@ -35,7 +37,7 @@ class Validator
      *
      * @return bool
      */
-    public function failed()
+    public function fails()
     {
         return !empty($this->errors);
     }
@@ -48,5 +50,16 @@ class Validator
     public function getErrors()
     {
         return $this->errors;
+    }
+
+    public function addError(NestedValidationException $exception, string $field, array $messages = [])
+    {
+        if (empty($messages)) {
+            $this->errors[$field] = $exception->getMessages();
+
+            return;
+        }
+
+        $this->errors[$field] = array_values(array_filter($exception->findMessages($messages)));
     }
 }
