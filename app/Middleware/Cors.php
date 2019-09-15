@@ -26,30 +26,14 @@ class Cors extends Middleware
             return $response->withJson(['status' => 'error', 'message' => 'CORS Forbidden'], 403);
         }
 
-        $settings = $this->settings['cors'];
-
-        $allowed_origin = (in_array('*', $settings['allowed_origin']) && !$settings['credentials'])
-            ? '*'
-            : $request->getHeaderLine('Origin');
-        $response->withHeader('Access-Control-Allow-Origin', $allowed_origin);
-
-        if ($settings['credentials']) {
-            $response->withHeader('Access-Control-Allow-Credentials', true);
-        }
-
         // Check request is a preflight request
         if ($request->isOptions()) {
-            return $response
-                ->withHeader('Access-Control-Allow-Methods', implode(', ', $settings['methods']))
-                ->withHeader('Access-Control-Allow-Headers', implode(', ', $settings['allow_headers']))
-                ->withHeader('Access-Control-Max-Age', $settings['max_age'])
-                ->withStatus(204, 'Preflight OK');
+            return $this->responseWithPreflightHeaders($request, $response);
         }
 
         $response = $next($request, $response);
 
-        return $response
-            ->withHeader('Access-Control-Expose-Headers', implode(', ', $settings['expose_headers']));
+        return $this->responseWithCorsHeaders($request, $response);
     }
 
     /**
@@ -79,18 +63,79 @@ class Cors extends Middleware
     {
         $settings = $this->settings['cors'];
 
-        if (!in_array($request->getMethod(), $settings['methods'])) {
+        if (!in_array($request->getMethod(), $settings['allowed_methods'])) {
             return false;
         }
 
-        if (in_array('*', $settings['origin'])) {
+        if (in_array('*', $settings['allowed_origins'])) {
             return true;
         }
 
-        $matches = array_filter($settings['origin'], function ($origin) use ($request) {
+        $matches = array_filter($settings['allowed_origins'], function ($origin) use ($request) {
             return fnmatch($origin, $request->getHeaderLine('Origin'));
         });
 
         return $matches > 0;
+    }
+
+    /**
+     * Returns the response with the HTTP headers required to handle Preflight requests
+     *
+     * @param Psr\Http\Message\ServerRequestInterface $request
+     * @param \Psr\Http\Message\ResponseInterface $response
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    protected function responseWithPreflightHeaders(Request $request, Response $response)
+    {
+        $settings = $this->settings['cors'];
+
+        if ($settings['credentials']) {
+            $response  = $response->withHeader('Access-Control-Allow-Credentials', 'true');
+        }
+
+        return $response
+            ->withHeader('Access-Control-Allow-Origin', $this->allowedOrigin($request))
+            ->withHeader('Access-Control-Allow-Methods', implode(', ', $settings['allowed_methods']))
+            ->withHeader('Access-Control-Allow-Headers', implode(', ', $settings['allow_headers']))
+            ->withHeader('Access-Control-Max-Age', $settings['max_age'])
+            ->withStatus(204, 'Preflight OK');
+    }
+
+    /**
+     * Returns the response with the HTTP headers required to handle CORS requests
+     *
+     * @param Psr\Http\Message\ServerRequestInterface $request
+     * @param \Psr\Http\Message\ResponseInterface $response
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    protected function responseWithCorsHeaders(Request $request, Response $response)
+    {
+        $settings = $this->settings['cors'];
+
+        if ($settings['credentials']) {
+            $response  = $response->withHeader('Access-Control-Allow-Credentials', 'true');
+        }
+
+        return $response
+            ->withHeader('Access-Control-Allow-Origin', $this->allowedOrigin($request))
+            ->withHeader('Access-Control-Expose-Headers', implode(', ', $settings['expose_headers']));
+    }
+
+    /**
+     * Returns the allowed origin string
+     *
+     * @param Psr\Http\Message\ServerRequestInterface $request
+     *
+     * @return string
+     */
+    protected function allowedOrigin(Request $request)
+    {
+        $settings = $this->settings['cors'];
+
+        return (in_array('*', $settings['allowed_origins']) && !$settings['credentials'])
+            ? '*'
+            : $request->getHeaderLine('Origin');
     }
 }
