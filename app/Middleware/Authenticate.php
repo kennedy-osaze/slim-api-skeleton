@@ -27,7 +27,7 @@ class Authenticate extends Middleware
         $token = $this->jwt->getTokenFromRequest();
 
         if (!$token) {
-            return $response->withJson(['status' => 'error', 'message' => 'Token is required'], 401);
+            return $response->withJson(['status' => 401, 'error' => ['message' => 'Token is required']], 401);
         }
 
         try {
@@ -37,11 +37,11 @@ class Authenticate extends Middleware
             return $next($request, $response);
         } catch (Exception $e) {
             if ($e instanceof TokenExpiredException) {
-                return $response->withJson(['status' => 'error', 'message' => 'Token has expired']);
+                return $response->withJson(['status' => 401, 'error' => ['message' => 'Token has expired']]);
             }
 
             if ($e instanceof TokenInvalidException) {
-                return $response->withJson(['status' => 'error', 'message' => 'Token is invalid']);
+                return $response->withJson(['status' => 400, 'error' => ['message' => 'Token is invalid']]);
             }
 
             throw new HttpException(500, 'An error occurred authenticating user', $e);
