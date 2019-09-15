@@ -1,9 +1,11 @@
 <?php
 
+// Load environment variables
 (\Dotenv\Dotenv::create(__DIR__ . '/../'))->load();
 
 $config = require '../config/index.php';
 
+// Instantiate the application
 $app = new \Slim\App(['settings' => $config]);
 
 // Set up dependencies

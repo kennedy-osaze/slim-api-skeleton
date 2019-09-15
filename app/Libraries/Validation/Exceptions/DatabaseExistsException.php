@@ -4,6 +4,7 @@ namespace App\Libraries\Validation\Exceptions;
 
 use Respect\Validation\Exceptions\ValidationException;
 
+// Exception to the \App\Libraries\Validation\Rules\DatabaseExists Rule
 class DatabaseExistsException extends ValidationException
 {
     public static $defaultTemplates = [

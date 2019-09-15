@@ -7,6 +7,15 @@ use Psr\Http\Message\ResponseInterface as Response;
 
 class TrailingSlash extends Middleware
 {
+    /**
+     * Handles incoming requests by redirecting urls ending with '/' to the non-trailing equivalent
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \Psr\Http\Message\ResponseInterface $response
+     * @param \Closure $next
+     *
+     * @return mixed
+     */
     public function __invoke(Request $request, Response $response, $next)
     {
         $uri = $request->getUri();
