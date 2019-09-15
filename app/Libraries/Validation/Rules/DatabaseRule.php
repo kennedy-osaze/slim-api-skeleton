@@ -8,16 +8,19 @@ use Illuminate\Database\Capsule\Manager as Capsule;
 
 abstract class DatabaseRule extends AbstractRule
 {
-    public $table;
+    protected $database;
 
-    public $field;
+    protected $table;
 
-    public $options;
+    protected $column;
 
-    public function __construct(Capsule $database, string $table, string $field, Closure $callback = null)
+    protected $options;
+
+    public function __construct(Capsule $database, string $table, string $column, Closure $callback = null)
     {
+        $this->database = $database;
         $this->table = $table;
-        $this->field = $field;
+        $this->column = $column;
         $this->callback = $callback;
     }
 
