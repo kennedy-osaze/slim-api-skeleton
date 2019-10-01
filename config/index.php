@@ -49,8 +49,8 @@ return [
     ],
 
     'cors' => [
-        "origin" => ['*'],
-        "methods" => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+        "allowed_origins" => ['*'],
+        "allowed_methods" => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
         "allow_headers" => ['X-Requested-With', 'Content-Type', 'Accept', 'Origin', 'Authorization'],
         "expose_headers" =>['Cache-Control', 'Content-Language', 'Content-Type', 'Expires', 'Last-Modified', 'Pragma'],
         "credentials" => false,
